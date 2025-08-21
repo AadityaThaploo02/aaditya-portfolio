@@ -163,6 +163,17 @@ function FocusView({
 /* ====================================================================== */
 type Tab = "projects" | "experience" | "skills" | "education" | "honors";
 
+/** Shape for the computed modal payload so we don’t need `as any`. */
+type FocusContent =
+  | {
+      title: string;
+      subtitle?: string;
+      meta?: React.ReactNode;
+      body?: React.ReactNode;
+      tags?: string[];
+    }
+  | null;
+
 export default function Page() {
   const [darkMode, setDarkMode] = useState(true);
   const [active, setActive] = useState<Tab>("projects");
@@ -303,7 +314,7 @@ export default function Page() {
   /* ===================== DATA: Experience / Skills / Education / Honors ===================== */
   const experience = [
     {
-      role: "IT Support & Automation Intern",
+      role: "IT Support & Automation",
       company: "Logenix International · Internship",
       dates: "May 2024 – Jul 2024 · 3 mos",
       location: "Washington, United States · On-site",
@@ -318,7 +329,7 @@ export default function Page() {
       ],
     },
     {
-      role: "Software Engineer Intern",
+      role: "Software Engineer",
       company: "Virtusa Consulting Services Pvt. Ltd. · Internship",
       dates: "Jan 2023 – Jun 2023 · 6 mos",
       location: "Mumbai, Maharashtra, India · Remote",
@@ -413,7 +424,7 @@ export default function Page() {
   const closeDetail = () => setFocus(null);
 
   /* ===================== Build modal content by focus target ===================== */
-  const focusContent = (() => {
+  const focusContent: FocusContent = (() => {
     if (!focus) return null;
 
     if (focus.kind === "project" && focus.index !== undefined) {
@@ -573,7 +584,7 @@ export default function Page() {
                   <Mail className="mr-2 h-4 w-4" /> {profile.email}
                 </Button>
 
-                <a href={profile.linkedin} target="_blank">
+                <a href={profile.linkedin} target="_blank" rel="noreferrer">
                   <Button
                     variant="secondary"
                     className="hover:-translate-y-0.5"
@@ -600,15 +611,7 @@ export default function Page() {
         {/* Tabs */}
         <div className="mx-auto max-w-6xl mt-10">
           <div className="flex flex-wrap gap-2 justify-center sticky top-14 z-20 py-3 backdrop-blur-sm bg-black/30 rounded-xl border border-zinc-800">
-            {(
-              [
-                { key: "projects", label: "Projects" },
-                { key: "experience", label: "Professional Experience" },
-                { key: "skills", label: "Skills" },
-                { key: "education", label: "Education" },
-                { key: "honors", label: "Honors & Awards" },
-              ] as { key: Tab; label: string }[]
-            ).map((t) => {
+            {tabs.map((t) => {
               const isActive = active === t.key;
               return (
                 <Button
@@ -856,10 +859,10 @@ export default function Page() {
         open={!!focusContent}
         onClose={closeDetail}
         title={focusContent?.title || ""}
-        subtitle={focusContent?.subtitle as string}
+        subtitle={focusContent?.subtitle}
         meta={focusContent?.meta}
         body={focusContent?.body}
-        tags={(focusContent as any)?.tags}
+        tags={focusContent?.tags}
       />
     </div>
   );
