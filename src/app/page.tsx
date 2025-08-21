@@ -197,7 +197,7 @@ export default function Page() {
       "Computer Science MS, Purdue University | Software Engineering • Cybersecurity • Machine Learning & AI • Data Engineering • Automation",
     about:
       "Computer Science Master’s graduate with hands-on experience in software engineering, cybersecurity, and analytics. Designed scalable systems that improve performance, strengthen reliability, and reduce security risks. Passionate about ML, distributed computing, and automation; eager to deliver measurable impact in software development, information security, QA, and data engineering.",
-    location: "United States",
+    location: "India | United States",
     email: "aadityathaploo02@gmail.com",
     linkedin: "https://www.linkedin.com/in/aaditya-thaploo-2a6717189/",
     resume: "/Athaploo_updated.pdf",
