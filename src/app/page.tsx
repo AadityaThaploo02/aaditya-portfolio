@@ -68,7 +68,13 @@ function CardContent({
 }
 
 /* === Universal Focus Modal ============================================ */
-type FocusKind = "project" | "experience" | "education" | "honor" | "skill";
+type FocusKind =
+  | "project"
+  | "experience"
+  | "education"
+  | "honor"
+  | "skill"
+  | "certification";
 type FocusTarget = { kind: FocusKind; index?: number; label?: string } | null;
 
 function useEscClose(onClose: () => void) {
@@ -161,7 +167,13 @@ function FocusView({
 }
 
 /* ====================================================================== */
-type Tab = "projects" | "experience" | "skills" | "education" | "honors";
+type Tab =
+  | "projects"
+  | "experience"
+  | "skills"
+  | "education"
+  | "honors"
+  | "certifications";
 
 /** Shape for the computed modal payload so we don’t need `as any`. */
 type FocusContent =
@@ -386,7 +398,12 @@ export default function Page() {
     },
   ];
 
-  const honors = [
+  // honors: desc supports string OR string[]
+  const honors: Array<{
+    title: string;
+    org: string;
+    desc: string | string[];
+  }> = [
     {
       title: "Capstone Project Award – Best in Department",
       org: "MIT-WPU Pune",
@@ -396,8 +413,105 @@ export default function Page() {
     {
       title: "Workshops & Leadership",
       org: "MIT-WPU Pune",
+      desc: [
+        "I led my college’s Industrial Tour in Bengaluru, coordinating visits to organizations and facilitating student–industry interaction.",
+        "I attend workshops on Supply Chain Management and Communications, enhancing my knowledge of logistics, efficiency, and professional communication.",
+        "I participated in Rehabilitation & Counselling Services programs, gaining experience in empathy, guidance, and social responsibility.",
+        "I served as Captain of my college basketball team, showcasing leadership, teamwork, and strategic thinking in inter-collegiate tournaments.",
+      ],
+    },
+  ];
+
+  // === Certifications ====================================================
+  const certifications: Array<{
+    title: string;
+    org: string;
+    date?: string;
+    credentialId?: string;
+    verifyUrl?: string;
+    tags?: string[];
+    desc?: string | string[];
+  }> = [
+    {
+      title: "Assets, Threats, and Vulnerabilities",
+      org: "Google (Coursera)",
+      date: "Jan 6, 2024",
+      tags: ["Cybersecurity", "Risk"],
       desc:
-        "Led college industrial tour (Bengaluru). Workshops on Supply Chain Management & Communications; Rehabilitation & Counselling Services. Captain of the college basketball team.",
+        "Core security concepts: assets vs. threats, common vulnerabilities, and risk assessment frameworks for prioritizing defenses.",
+      // verifyUrl intentionally omitted (not fully legible in screenshot)
+    },
+    {
+      title: "Connect and Protect: Networks and Network Security",
+      org: "Google (Coursera)",
+      date: "Jan 3, 2024",
+      tags: ["Networking", "Security"],
+      verifyUrl: "https://coursera.org/verify/ESWBLBF75GJE",
+      desc:
+        "Covers TCP/IP, firewalls, proxies, and segmentation with practical strategies to secure networked systems.",
+    },
+    {
+      title: "Data Science Orientation",
+      org: "IBM (Coursera/Credly)",
+      date: "Dec 26, 2023",
+      tags: ["Data Science", "Foundations"],
+      verifyUrl: "https://www.credly.com/go/Orao2M8L",
+      desc:
+        "Introduces the data science workflow, roles, and tools—setting the stage for hands-on analytics and ML.",
+    },
+    {
+      title: "Foundations of Cybersecurity",
+      org: "Google (Coursera)",
+      date: "Dec 26, 2023",
+      tags: ["Security", "Fundamentals"],
+      verifyUrl: "https://coursera.org/verify/3LE6RM7F7LZC",
+      desc:
+        "Security principles, CIA triad, controls, and frameworks with context for entry-level SOC/analyst work.",
+    },
+    {
+      title: "What is Data Science?",
+      org: "IBM (Coursera)",
+      date: "Dec 26, 2023",
+      tags: ["Data Science"],
+      verifyUrl: "https://coursera.org/verify/UA3MYLHYGKB",
+      desc:
+        "A high-level overview of DS practice, real-world applications, and how data-driven decisions are made.",
+    },
+    {
+      title: "Introduction to Generative AI",
+      org: "Google Cloud Training (Coursera)",
+      date: "Dec 19, 2023",
+      tags: ["GenAI", "AI"],
+      verifyUrl: "https://coursera.org/verify/4VKCA8AXPSPF",
+      desc:
+        "Explains foundation models and generative techniques with practical use cases for text and content generation.",
+    },
+    {
+      title: "Play It Safe: Manage Security Risks",
+      org: "Google (Coursera)",
+      date: "Dec 28, 2023",
+      tags: ["Risk", "Security"],
+      verifyUrl: "https://coursera.org/verify/KF9HCDDMZLBB",
+      desc:
+        "Risk management lifecycle, threat modeling, and control selection to reduce business exposure.",
+    },
+    {
+      title: "Sound the Alarm: Detection and Response",
+      org: "Google (Coursera)",
+      date: "Jan 6, 2024",
+      tags: ["SOC", "IR"],
+      verifyUrl: "https://coursera.org/verify/TAJFHHFNL9FQ",
+      desc:
+        "Monitoring, alerting, and incident response fundamentals—triage, containment, and recovery best practices.",
+    },
+    {
+      title: "Tools of the Trade: Linux and SQL",
+      org: "Google (Coursera)",
+      date: "Jan 3, 2024",
+      tags: ["Linux", "SQL"],
+      verifyUrl: "https://coursera.org/verify/7UPG2USXC6MQ",
+      desc:
+        "Hands-on basics with the Linux shell and SQL queries for investigation, automation, and reporting.",
     },
   ];
 
@@ -409,6 +523,7 @@ export default function Page() {
       { key: "skills", label: "Skills" },
       { key: "education", label: "Education" },
       { key: "honors", label: "Honors & Awards" },
+      { key: "certifications", label: "Certifications" },
     ],
     []
   );
@@ -499,7 +614,54 @@ export default function Page() {
       return {
         title: h.title,
         subtitle: h.org,
-        body: <p>{h.desc}</p>,
+        body: Array.isArray(h.desc) ? (
+          <ul className="list-disc pl-5 space-y-2">
+            {h.desc.map((d, i) => (
+              <li key={i}>{d}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>{h.desc}</p>
+        ),
+      };
+    }
+
+    if (focus.kind === "certification" && focus.index !== undefined) {
+      const c = certifications[focus.index];
+      return {
+        title: c.title,
+        subtitle: c.org,
+        tags: c.tags,
+        meta: (
+          <div>
+            {c.date ? <span>Issued: {c.date}</span> : null}
+            {c.credentialId ? (
+              <span className="ml-2">• Credential ID: {c.credentialId}</span>
+            ) : null}
+            {c.verifyUrl ? (
+              <span className="ml-2">
+                •{" "}
+                <a
+                  href={c.verifyUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  Verify
+                </a>
+              </span>
+            ) : null}
+          </div>
+        ),
+        body: Array.isArray(c.desc) ? (
+          <ul className="list-disc pl-5 space-y-2">
+            {c.desc.map((d, i) => (
+              <li key={i}>{d}</li>
+            ))}
+          </ul>
+        ) : c.desc ? (
+          <p>{c.desc}</p>
+        ) : undefined,
       };
     }
 
@@ -824,9 +986,21 @@ export default function Page() {
                           {h.title}
                         </div>
                         <div className="text-xs text-zinc-400">{h.org}</div>
-                        <p className="mt-2 text-sm leading-relaxed line-clamp-3">
-                          {h.desc}
-                        </p>
+
+                        {Array.isArray(h.desc) ? (
+                          <ul className="mt-2 list-disc pl-5 text-sm leading-relaxed space-y-1">
+                            {h.desc.map((d, j) => (
+                              <li key={j} className="line-clamp-2">
+                                {d}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="mt-2 text-sm leading-relaxed line-clamp-3">
+                            {h.desc}
+                          </p>
+                        )}
+
                         <div className="mt-4">
                           <Button
                             size="sm"
@@ -834,6 +1008,77 @@ export default function Page() {
                             onClick={(ev) => {
                               ev.stopPropagation();
                               openDetail("honor", i);
+                            }}
+                          >
+                            View details
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </motion.div>
+              )}
+
+              {active === "certifications" && (
+                <motion.div
+                  key="certifications"
+                  variants={contentVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 0.25 }}
+                  className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
+                >
+                  {certifications.map((c, i) => (
+                    <Card
+                      key={i}
+                      className="hover:-translate-y-0.5 transition"
+                      onClick={() => openDetail("certification", i)}
+                    >
+                      <CardContent>
+                        <div className="font-semibold text-lg tracking-tight">
+                          {c.title}
+                        </div>
+                        <div className="text-xs text-zinc-400 mt-1">
+                          {c.org}
+                          {c.date ? ` • ${c.date}` : ""}
+                          {c.credentialId ? ` • ID: ${c.credentialId}` : ""}
+                        </div>
+
+                        {c.tags && c.tags.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {c.tags.map((t, ti) => (
+                              <span
+                                key={ti}
+                                className="px-2 py-0.5 text-[11px] rounded-full border border-zinc-700 bg-zinc-900 text-zinc-200"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {Array.isArray(c.desc) ? (
+                          <ul className="mt-2 list-disc pl-5 text-sm leading-relaxed space-y-1">
+                            {c.desc.slice(0, 3).map((d, j) => (
+                              <li key={j} className="line-clamp-2">
+                                {d}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : c.desc ? (
+                          <p className="mt-2 text-sm leading-relaxed line-clamp-3">
+                            {c.desc}
+                          </p>
+                        ) : null}
+
+                        <div className="mt-4">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              openDetail("certification", i);
                             }}
                           >
                             View details
