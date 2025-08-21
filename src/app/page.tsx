@@ -74,7 +74,8 @@ type FocusKind =
   | "education"
   | "honor"
   | "skill"
-  | "certification";
+  | "certification"
+  | "resume";
 type FocusTarget = { kind: FocusKind; index?: number; label?: string } | null;
 
 function useEscClose(onClose: () => void) {
@@ -187,7 +188,8 @@ type FocusContent =
   | null;
 
 export default function Page() {
-  const [darkMode, setDarkMode] = useState(true);
+  // Removed the setter to avoid ESLint "unused var" now that the toggle is gone
+  const [darkMode] = useState(true);
   const [active, setActive] = useState<Tab>("projects");
   const [focus, setFocus] = useState<FocusTarget>(null);
 
@@ -439,7 +441,6 @@ export default function Page() {
       tags: ["Cybersecurity", "Risk"],
       desc:
         "Core security concepts: assets vs. threats, common vulnerabilities, and risk assessment frameworks for prioritizing defenses.",
-      // verifyUrl intentionally omitted (not fully legible in screenshot)
     },
     {
       title: "Connect and Protect: Networks and Network Security",
@@ -538,9 +539,56 @@ export default function Page() {
     setFocus({ kind, index, label });
   const closeDetail = () => setFocus(null);
 
+  // === Resume click: open modal + trigger file download ==================
+  const handleResumeClick = () => {
+    openDetail("resume");
+    // Trigger a download in the background so the user keeps reading the modal
+    try {
+      const link = document.createElement("a");
+      link.href = profile.resume;
+      // leaving filename blank lets browser pick the PDF name
+      link.download = "";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+      // ignore if blocked
+    }
+  };
+
   /* ===================== Build modal content by focus target ===================== */
   const focusContent: FocusContent = (() => {
     if (!focus) return null;
+
+    if (focus.kind === "resume") {
+      return {
+        title: "Resume (PDF)",
+        subtitle: "Open & review without leaving the page",
+        body: (
+          <div className="space-y-4">
+            <div className="aspect-[8.5/11] w-full">
+              <iframe
+                src={`${profile.resume}#view=FitH`}
+                className="w-full h-[70vh] rounded-lg border border-zinc-800"
+                title="Resume PDF"
+              />
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <a href={profile.resume} download>
+                <Button variant="secondary" size="sm">
+                  Download PDF
+                </Button>
+              </a>
+              <a href={profile.resume} target="_blank" rel="noreferrer">
+                <Button variant="secondary" size="sm">
+                  Open in New Tab
+                </Button>
+              </a>
+            </div>
+          </div>
+        ),
+      };
+    }
 
     if (focus.kind === "project" && focus.index !== undefined) {
       const p = projects[focus.index];
@@ -696,19 +744,11 @@ export default function Page() {
             {profile.name}
           </div>
           <div className="flex items-center gap-2">
-            <a href={profile.resume} download>
-              <Button variant="secondary" size="sm">
-                Resume
-              </Button>
-            </a>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setDarkMode((v) => !v)}
-              className="hover:scale-[1.02]"
-            >
-              {darkMode ? "Light" : "Dark"}
+            {/* Resume button now opens modal + triggers download */}
+            <Button variant="secondary" size="sm" onClick={handleResumeClick}>
+              Resume
             </Button>
+            {/* Light/Dark toggle removed per request */}
           </div>
         </div>
       </header>
@@ -755,14 +795,14 @@ export default function Page() {
                   </Button>
                 </a>
 
-                <a href={profile.resume} download>
-                  <Button
-                    variant="secondary"
-                    className="hover:-translate-y-0.5"
-                  >
-                    <FileText className="mr-2 h-4 w-4" /> Resume
-                  </Button>
-                </a>
+                {/* Resume button in hero uses the same behavior */}
+                <Button
+                  variant="secondary"
+                  className="hover:-translate-y-0.5"
+                  onClick={handleResumeClick}
+                >
+                  <FileText className="mr-2 h-4 w-4" /> Resume
+                </Button>
               </div>
 
               <p className="mt-4 text-sm text-zinc-400">{profile.location}</p>
