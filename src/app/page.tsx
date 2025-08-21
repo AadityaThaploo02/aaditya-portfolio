@@ -188,7 +188,7 @@ type FocusContent =
   | null;
 
 export default function Page() {
-  // Removed the setter to avoid ESLint "unused var" now that the toggle is gone
+  // darkMode kept for the page background classes
   const [darkMode] = useState(true);
   const [active, setActive] = useState<Tab>("projects");
   const [focus, setFocus] = useState<FocusTarget>(null);
@@ -542,11 +542,9 @@ export default function Page() {
   // === Resume click: open modal + trigger file download ==================
   const handleResumeClick = () => {
     openDetail("resume");
-    // Trigger a download in the background so the user keeps reading the modal
     try {
       const link = document.createElement("a");
       link.href = profile.resume;
-      // leaving filename blank lets browser pick the PDF name
       link.download = "";
       document.body.appendChild(link);
       link.click();
@@ -743,13 +741,8 @@ export default function Page() {
           <div className="text-sm font-semibold tracking-wide text-white/90">
             {profile.name}
           </div>
-          <div className="flex items-center gap-2">
-            {/* Resume button now opens modal + triggers download */}
-            <Button variant="secondary" size="sm" onClick={handleResumeClick}>
-              Resume
-            </Button>
-            {/* Light/Dark toggle removed per request */}
-          </div>
+          {/* Removed header Resume and theme toggle per request */}
+          <div className="flex items-center gap-2" />
         </div>
       </header>
 
@@ -795,7 +788,7 @@ export default function Page() {
                   </Button>
                 </a>
 
-                {/* Resume button in hero uses the same behavior */}
+                {/* Resume button in hero uses modal + download */}
                 <Button
                   variant="secondary"
                   className="hover:-translate-y-0.5"
