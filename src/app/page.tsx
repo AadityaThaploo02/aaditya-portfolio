@@ -202,7 +202,8 @@ export default function Page() {
     location: "India | United States",
     email: "aadityathaploo02@gmail.com",
     linkedin: "https://www.linkedin.com/in/aaditya-thaploo-2a6717189/",
-    resume: "/Athaploo_updated.pdf",
+    resume: "/AADITYA_THAPLOO.pdf",
+
   };
 
   /* ===================== DATA: Projects (Problem/Approach/Outcomes + tags) ===================== */
